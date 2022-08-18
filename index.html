@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>身体数据监测系统</title>
+	<!-- <link rel="stylesheet" href="//unpkg.com/layui@2.6.8/dist/css/layui.css"> -->
+	<link rel="stylesheet" type="text/css" href="./css/main.css">
+	<link rel="stylesheet" type="text/css" href="./css/body.css">
+	<link rel="stylesheet" type="text/css" href="./css/layui.css">
+    <script type="text/javascript">
+   		document.addEventListener('plusready', function(){
+   			//console.log("所有plus api都应该在此事件发生后调用，否则会出现plus is undefined。")
+   		});  		
+    </script>
+	<script src="./js/jquery2.2.4.min.js"></script>
+	<script src="./js/paho-mqtt-min.js"></script>
+	<script src="./js/paho-mqtt.js"></script>
+</head>
+<body>
+	<header>
+	    <h1 style="text-align: center;color: blue; font-family: "comic sans ms";,Georgia,Serif;" >身体数据监测系统</h1>
+	</header>
+				
+			<div class="layui-bg-gray" style="padding: 30px;">
+			  <div class="layui-row layui-col-space15">
+				  
+			    <div class="layui-col-md6" >
+			      <div class="layui-card">
+			        <div class="layui-card-header">你的身高(Cm)</div>
+			        <div class="layui-card-body" id="sg1">
+			          没有数据
+			        </div>
+			      </div>
+			    </div>
+				
+			    <div class="layui-col-md6">
+			      <div class="layui-card">
+			        <div class="layui-card-header">你的体重(Kg)</div>
+			        <div class="layui-card-body" id="tz1">
+			          没有数据
+			        </div>
+			      </div>
+			    </div>
+				
+				<div class="layui-col-md6">
+				  <div class="layui-card">
+				    <div class="layui-card-header">你的体温(℃)</div>
+				    <div class="layui-card-body" id="tw1">
+				      没有数据
+				    </div>
+				  </div>
+				</div>
+				
+				<div class="layui-col-md6">
+				  <div class="layui-card">
+				    <div class="layui-card-header">你的心率(BPM)</div>
+				    <div class="layui-card-body" id="xl1">
+						没有数据
+				    </div>
+				  </div>
+				</div>
+				
+			  </div>
+			</div> 
+			
+			<div class="layui-btn-container">
+				<button type="button" class="layui-btn layui-btn-normal layui-btn-radius" id="open" >获得建议</button>
+			</div>
+			
+			
+			<script>
+						
+						var sg=document.getElementById('sg1');
+						var tw=document.getElementById('tw1');
+						var xl=document.getElementById('xl1');
+						var tz=document.getElementById('tz1');
+
+			            client = new Paho.MQTT.Client("**.***.**.**", Number(8083), "kehuduan"); //建立客户端实例     参数:ip地址 端口号 连接名称
+			            var options = {
+			                timeout: 5,
+			                keepAliveInterval: 120,
+			                reconnect: false,
+			                onSuccess: onConnect,
+			                // onFailure: onFail,   
+			                userName: "***", //用户名
+			                password: "***", //密码
+			            };
+						
+			            client.connect(options); //连接服务器并注册连接成功处理事件
+			            function onConnect() {
+			                console.log("连接服务器成功");
+			                topic = 't/test'; //订阅的主题
+			                client.subscribe(topic); //订阅主题
+			                console.log("订阅主题");
+			            }
+			            client.onConnectionLost = onConnectionLost; //注册连接断开处理事件
+			            client.onMessageArrived = onMessageArrived; //注册消息接收处理事件
+			            function onConnectionLost(responseObject) {
+			                if (responseObject.errorCode !== 0) {
+			                    console.log("onConnectionLost:"+responseObject.errorMessage);
+			                    console.log("连接服务器已断开");
+				       alert("服务器已断开,请重新连接");
+			                }
+			            }
+						
+			            function onMessageArrived(message) {
+			                var jvalue=JSON.parse(message.payloadString);
+			                console.log(jvalue);
+	
+							
+							sg.innerHTML=jvalue.sg;
+							tz.innerHTML=jvalue.tz;
+							tw.innerHTML=jvalue.tw;
+							xl.innerHTML=jvalue.xl;
+							if(jvalue.tw==undefined)
+							{
+								tw.innerHTML="未成功测量";
+							}
+							if(jvalue.tz==undefined)
+							{
+								tz.innerHTML="未成功测量";
+							}
+							if(jvalue.sg==undefined)
+							{
+								sg.innerHTML="未成功测量";
+							}
+							if(jvalue.xl==undefined)
+							{
+								xl.innerHTML="未成功测量";
+							}
+			            }
+						
+				
+			</script>
+</body>
+</html>

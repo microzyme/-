@@ -1,0 +1,17 @@
+.layui-card-header{
+	text-align: center;
+	font-size: 17px;
+	font-style:italic;
+	color: black;
+	letter-spacing: 7px;
+	
+}
+
+.layui-card-body{
+	font-style:oblique
+}
+
+.layui-btn-container{
+	text-align: center;
+	margin-top: 17px;
+}
